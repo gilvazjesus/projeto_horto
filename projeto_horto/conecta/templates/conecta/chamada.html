@@ -1,0 +1,112 @@
+{% extends 'conecta/base.html' %}
+
+{% block content %}
+
+<style>
+
+
+/* ===== TABELA ===== */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+}
+
+th {
+     background-color: #cce5ff; /* azul claro */
+    color: #333;
+}
+
+td {
+    background-color: #ffffff; /* resto da tabela branco */
+}
+
+button[name="salvar"] {
+    margin-top: 15px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Espaçamento maior a partir da segunda coluna */
+th:nth-child(n+2),
+td:nth-child(n+2) {
+    padding: 6px 20px; /* aumenta o espaçamento horizontal */
+}
+
+</style>
+
+<h1>Chamada - Turma 01.2026</h1>
+
+<!-- MENSAGENS -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert 
+            {% if message.tags == 'success' %}
+                alert-success
+            {% else %}
+                alert-error
+            {% endif %}
+        ">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="table-container">
+<table border="1">
+
+<tr>
+<th>Aluno</th>
+{% for data in datas %}
+<th>{{ data }}</th>
+{% endfor %}
+</tr>
+
+{% for linha in tabela %}
+<tr>
+
+<td>{{ linha.aluno }}</td>
+
+{% for p in linha.presencas %}
+<td>
+<input type="checkbox"
+       name="{{ linha.aluno }}_{{ p.data }}"
+       value="1"
+       {% if p.checked %}checked{% endif %}>
+</td>
+{% endfor %}
+
+</tr>
+{% endfor %}
+
+</table>
+</div>
+
+<div style="margin-top:20px;">
+<input type="password"
+       name="senha"
+       placeholder="Digite a senha para salvar"
+       required>
+
+<button type="submit">
+Salvar Presença
+</button>
+</div>
+
+</form>
+
+
+{% endblock %}

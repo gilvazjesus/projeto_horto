@@ -1,0 +1,9 @@
+executar o servidor: python manage.py runserver
+
+criar projeto: django-admin startproject nome_do_projeto .
+criar projeto: django-admin startproject nome_do_projeto
+(segunda opção colocar o arquivo manager.py dentro da pasta)
+
+Criar app: python manage.py startapp nome_do_app
+
+1. View

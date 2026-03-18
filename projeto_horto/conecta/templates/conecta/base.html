@@ -1,0 +1,28 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conecta</title>
+	
+	<link rel="stylesheet" href="{% static 'conecta/css/style.css' %}">
+	
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a> 
+    <a href="{% url 'chamada' %}">Chamada</a>
+    <a href="{% url 'calendario' %}">Calendário</a>
+    <a href="{% url 'area_professor' %}">Área do Professor</a>
+    <a href="{% url 'area_aluno' %}">Área do Aluno</a>
+</nav>
+
+<main>
+{% block content %}
+{% endblock %}
+</main>
+
+
+</body>
+</html>

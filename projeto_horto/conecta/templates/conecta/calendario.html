@@ -1,0 +1,65 @@
+{% extends 'conecta/base.html' %}
+
+{% block content %}
+
+<style>
+
+
+/* ===== TABELA ===== */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+}
+
+th {
+     background-color: #cce5ff; /* azul claro */
+    color: #333;
+}
+
+
+</style>
+
+    <!-- CONTEÚDO -->
+    <div class="content">
+        <h1>Calendário</h1>
+        <p>Aqui você pode visualizar as aulas e quem irá ministrá-las.</p>
+		
+		<table border="1" cellpadding="5" cellspacing="0">
+		  <thead>
+			<tr>
+			  <th>Data (Sábado)</th>
+			  <th>Terá aula ?</th>
+			  <th>Aula</th>
+			  <th>Tema</th>
+			  <th>Professor</th>
+			  <th>Observação</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			{% for linha in dados %}
+			<tr>
+			  <td>{{ linha.Data }}</td>
+			  <td style="color: {% if linha.Tera_aula|lower|cut:" " == 'sim' %}blue{% else %}red{% endif %};">{{ linha.Tera_aula }}</td>
+			  <td>{{ linha.Aula }}</td>
+			  <td>{{ linha.Tema }}</td>
+			  <td>{{ linha.Professor }}</td>
+			  <td>{{ linha.Obs }}</td>
+			</tr>
+			{% endfor %}
+		  </tbody>
+		</table>
+
+    </div>
+
+{% endblock %}
+

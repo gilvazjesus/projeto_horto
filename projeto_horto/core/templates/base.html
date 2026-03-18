@@ -1,0 +1,22 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Projeto Horto</title>
+	
+	<link rel="stylesheet" href="{% static 'style.css' %}">
+	
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a> 
+    <a href="/conecta">Conecta</a>
+</nav>
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

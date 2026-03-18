@@ -1,0 +1,126 @@
+{% extends 'conecta/base.html' %}
+
+{% block content %}
+
+<style>
+/* Títulos em azul */
+h2 {
+    color: #1E90FF; /* azul dodger */
+    font-family: Arial, sans-serif;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+/* Tabelas com borda mais bonita e linhas alternadas */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+table th {
+    background-color: #cce5ff; /* azul clarinho */
+    text-align: left;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Botões estilizados */
+button {
+    background-color: #1E90FF;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #187bcd;
+}
+
+/* Inputs de data e anotação */
+input[type="date"], input[type="text"], input[type="password"] {
+    padding: 5px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+</style>
+
+<h1>Área do Professor</h1>
+
+<!-- Formulário de login se não enviou a senha -->
+{% if not aulas %}
+<form method="post">
+    {% csrf_token %}
+    <label for="senha">Digite a senha:</label>
+    <input type="password" name="senha" id="senha" required>
+    <button type="submit">Entrar</button>
+    {% if erro_senha %}
+    <p style="color:red;">Senha incorreta!</p>
+    {% endif %}
+</form>
+{% else %}
+
+<!-- Conteúdo do professor -->
+<div id="conteudo-professor" style="margin-top:20px;">
+
+  <h2>Diário de Bordo</h2>
+  <form method="post" style="margin-bottom:10px;">
+    {% csrf_token %}
+    <label>Data:</label>
+    <input type="date" name="data" required>
+    <label>Anotação:</label>
+    <input type="text" name="anotacao" required style="width:300px;">
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <table border="1" cellpadding="5" cellspacing="0" style="width:100%;">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Anotação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for linha in anotacoes %}
+      <tr>
+        <td>{{ linha.data }}</td>
+        <td>{{ linha.anotacao }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Materiais</h2>
+  <table border="1" cellpadding="5" cellspacing="0" style="width:100%;">
+    <thead>
+      <tr>
+        <th>Aula</th>
+        <th style="text-align:right;">Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for aula in aulas %}
+      <tr>
+        <td>📄 {{ aula.nome_aula }}</td>
+        <td style="text-align:right;">
+          <a href="{{ aula.link_arquivo }}" target="_blank">⬇️</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+{% endif %}
+{% endblock %}
