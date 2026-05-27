@@ -1,0 +1,305 @@
+{% extends 'conecta/base.html' %}
+
+{% block content %}
+
+<style>
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    margin-top: 20px;
+}
+
+table th,
+table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+table th {
+    background-color: #cce5ff;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+button {
+    background-color: #1E90FF;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #187bcd;
+}
+
+.btn-excluir {
+    background-color: #dc3545;
+}
+
+.btn-excluir:hover {
+    background-color: #b02a37;
+}
+
+input,
+select {
+    padding: 6px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.formulario {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.erro {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+</style>
+
+<h1>Material Aula</h1>
+
+<!-- FORMULÁRIO -->
+<div class="formulario">
+
+    <!--h2>Adicionar Material</h2-->
+	
+    <form method="post" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="acao"
+            value="salvar"
+        >
+
+        <!-- DESCRIÇÃO -->
+        <label>Descrição:</label>
+
+        <input
+            type="text"
+            name="descricao"
+            required
+            style="width:200px;"
+        >
+
+        <!-- TIPO -->
+        <label>Tipo:</label>
+
+        <select
+            name="tipo_material"
+            id="tipo_material"
+            onchange="trocarCampo()"
+        >
+
+            <option value="link">
+                Link
+            </option>
+
+            <option value="arquivo">
+                Arquivo
+            </option>
+
+        </select>
+
+        <!-- CAMPO LINK -->
+        <span id="campo_link">
+
+            <input
+                type="text"
+                name="link"
+                placeholder="Ex: youtube.com"
+                style="width:300px;"
+            >
+
+        </span>
+
+        <!-- CAMPO ARQUIVO -->
+        <span id="campo_arquivo" style="display:none;">
+
+            <input
+                type="file"
+                name="arquivo"
+            >
+
+        </span>
+
+        <!-- SENHA -->
+        <label>Senha:</label>
+
+        <input
+            type="password"
+            name="senha"
+            required
+        >
+
+        <!-- BOTÃO -->
+        <button type="submit">
+            Salvar
+        </button>
+
+    </form>
+
+    <!-- ERRO -->
+    {% if erro_senha %}
+
+        <p class="erro">
+            Senha incorreta
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>Descrição</th>
+            <th>Material</th>
+            <th>Excluir</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        <!-- CSV -->
+        {% for material in materiais %}
+
+        <tr>
+
+            <td>
+                {{ material.descricao }}
+            </td>
+
+            <td>
+
+                <!-- LINK -->
+                {% if material.tipo_material == 'link' %}
+
+                    <a
+                        href="https://{{ material.link|cut:'https://'|cut:'http://' }}"
+                        target="_blank"
+                    >
+                        {{ material.link }}
+                    </a>
+
+                <!-- ARQUIVO -->
+                {% else %}
+
+                    <a
+                        href="{{ material.arquivo }}"
+                        download
+                    >
+                        Baixar Arquivo
+                    </a>
+
+                {% endif %}
+
+            </td>
+
+            <!-- EXCLUIR -->
+            <td>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <input
+                        type="hidden"
+                        name="acao"
+                        value="excluir"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="linha"
+                        value="{{ forloop.counter0 }}"
+                    >
+
+                    <input
+                        type="password"
+                        name="senha"
+                        placeholder="Senha"
+                        required
+                        style="width:100px;"
+                    >
+
+                    <button
+                        type="submit"
+                        class="btn-excluir"
+                    >
+                        Excluir
+                    </button>
+
+                </form>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+<script>
+
+function trocarCampo() {
+
+    let tipo =
+        document.getElementById(
+            "tipo_material"
+        ).value;
+
+    let campoLink =
+        document.getElementById(
+            "campo_link"
+        );
+
+    let campoArquivo =
+        document.getElementById(
+            "campo_arquivo"
+        );
+
+    // LINK
+    if (tipo == "link") {
+
+        campoLink.style.display = "inline";
+
+        campoArquivo.style.display = "none";
+
+    }
+
+    // ARQUIVO
+    else {
+
+        campoLink.style.display = "none";
+
+        campoArquivo.style.display = "inline";
+
+    }
+}
+
+</script>
+
+{% endblock %}

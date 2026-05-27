@@ -22,6 +22,7 @@ alunos = [
     "Bianca dos Santos",
     "Lucius Calisto",
     "Pedro Henrique",
+    "Byanca Cavenatti",
 ]
 
 
@@ -185,6 +186,267 @@ def area_professor(request):
         'aulas': dados,
         'anotacoes': anotacoes
     })
+    
+# views.py
+
+import os
+import csv
+
+from django.conf import settings
+from django.shortcuts import render, redirect
+
+
+# ==========================
+# CSV
+# ==========================
+MATERIAIS_CSV = 'materiais.csv'
+
+# ==========================
+# SENHA
+# ==========================
+SENHA_UPLOAD = 'subir_material'
+
+
+def material_aula(request):
+
+    # ==========================
+    # ERRO SENHA
+    # ==========================
+    erro_senha = False
+
+    # ==========================
+    # POST
+    # ==========================
+    if request.method == 'POST':
+
+        acao = request.POST.get('acao')
+
+        senha = request.POST.get('senha')
+
+        # senha errada
+        if senha != SENHA_UPLOAD:
+
+            erro_senha = True
+
+        else:
+
+            # ==========================
+            # SALVAR
+            # ==========================
+            if acao == 'salvar':
+
+                descricao = request.POST.get(
+                    'descricao'
+                )
+
+                tipo = request.POST.get(
+                    'tipo_material'
+                )
+
+                link = ''
+                arquivo = ''
+
+                # ======================
+                # LINK
+                # ======================
+                if tipo == 'link':
+
+                    link = request.POST.get(
+                        'link'
+                    )
+
+                # ======================
+                # ARQUIVO
+                # ======================
+                if tipo == 'arquivo':
+
+                    arquivo_enviado = request.FILES.get(
+                        'arquivo'
+                    )
+
+                    if arquivo_enviado:
+
+                        pasta_arquivos = os.path.join(
+                            settings.BASE_DIR,
+                            'conecta',
+                            'static',
+                            'conecta',
+                            'files'
+                        )
+
+                        # cria pasta
+                        os.makedirs(
+                            pasta_arquivos,
+                            exist_ok=True
+                        )
+
+                        caminho_arquivo = os.path.join(
+                            pasta_arquivos,
+                            arquivo_enviado.name
+                        )
+
+                        # salva arquivo
+                        with open(
+                            caminho_arquivo,
+                            'wb+'
+                        ) as destino:
+
+                            for chunk in arquivo_enviado.chunks():
+
+                                destino.write(chunk)
+
+                        # caminho html
+                        arquivo = (
+                            '/static/conecta/files/'
+                            + arquivo_enviado.name
+                        )
+
+                # ======================
+                # CSV
+                # ======================
+                arquivo_existe = os.path.exists(
+                    MATERIAIS_CSV
+                )
+
+                with open(
+                    MATERIAIS_CSV,
+                    'a',
+                    newline='',
+                    encoding='utf-8'
+                ) as f:
+
+                    writer = csv.writer(f)
+
+                    # cabeçalho
+                    if not arquivo_existe:
+
+                        writer.writerow([
+                            'descricao',
+                            'tipo_material',
+                            'link',
+                            'arquivo'
+                        ])
+
+                    # linha
+                    writer.writerow([
+                        descricao,
+                        tipo,
+                        link,
+                        arquivo
+                    ])
+
+                return redirect(request.path)
+
+            # ==========================
+            # EXCLUIR
+            # ==========================
+            if acao == 'excluir':
+
+                linha_excluir = int(
+                    request.POST.get('linha')
+                )
+
+                linhas = []
+
+                with open(
+                    MATERIAIS_CSV,
+                    newline='',
+                    encoding='utf-8'
+                ) as f:
+
+                    reader = csv.reader(f)
+
+                    for row in reader:
+
+                        linhas.append(row)
+
+                cabecalho = linhas[0]
+
+                dados = linhas[1:]
+
+                # ======================
+                # PEGA ITEM
+                # ======================
+                item = dados[linha_excluir]
+
+                tipo_material = item[1]
+
+                caminho_arquivo = item[3]
+
+                # ======================
+                # APAGA ARQUIVO FÍSICO
+                # ======================
+                if tipo_material == 'arquivo':
+
+                    if caminho_arquivo:
+
+                        caminho_fisico = os.path.join(
+                            settings.BASE_DIR,
+                            caminho_arquivo.replace(
+                                '/static/',
+                                'conecta/static/'
+                            )
+                        )
+
+                        if os.path.exists(
+                            caminho_fisico
+                        ):
+
+                            os.remove(
+                                caminho_fisico
+                            )
+
+                # remove linha csv
+                del dados[linha_excluir]
+
+                # reescreve csv
+                with open(
+                    MATERIAIS_CSV,
+                    'w',
+                    newline='',
+                    encoding='utf-8'
+                ) as f:
+
+                    writer = csv.writer(f)
+
+                    writer.writerow(cabecalho)
+
+                    writer.writerows(dados)
+
+                return redirect(request.path)
+
+    # ==========================
+    # LER MATERIAIS
+    # ==========================
+    materiais = []
+
+    if os.path.exists(MATERIAIS_CSV):
+
+        with open(
+            MATERIAIS_CSV,
+            newline='',
+            encoding='utf-8'
+        ) as f:
+
+            reader = csv.DictReader(f)
+
+            for row in reader:
+
+                materiais.append(row)
+
+    # ==========================
+    # RENDER
+    # ==========================
+    return render(
+        request,
+        'conecta/material_aula.html',
+        {
+
+            'materiais': materiais,
+            'erro_senha': erro_senha
+
+        }
+    )
     
 def area_aluno(request):
     return render(request, 'conecta/area_aluno.html')

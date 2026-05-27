@@ -7,4 +7,5 @@ urlpatterns = [
     path('chamada/', views.chamada, name='chamada'),
     path('area_professor/', views.area_professor, name='area_professor'),
     path('area_aluno/', views.area_aluno, name='area_aluno'),
+    path('material_aula/', views.material_aula, name='material_aula'),
 ]
